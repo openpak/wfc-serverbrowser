@@ -1,0 +1,17 @@
+[Unit]
+Description=OpenPak WFC serverbrowser
+After=openpak-postgres.service
+
+[Container]
+ContainerName=openpak-wfc-serverbrowser
+Image=ghcr.io/openpak/wfc-serverbrowser:latest
+Network=openpak.network
+EnvironmentFile=%h/openpak/deploy/wfc-full/wfc-serverbrowser.env
+Volume=%h/openpak/deploy/wfc-split/token.key:/keys/wfc-token.key:ro,U
+PublishPort=0.0.0.0:28910:28910/tcp
+
+[Service]
+Restart=always
+
+[Install]
+WantedBy=default.target
