@@ -4,8 +4,10 @@ import (
 	"encoding/binary"
 	"encoding/gob"
 	"openpak/wfc-common/common"
+	"openpak/wfc-common/httplog"
 	"openpak/wfc-common/logging"
 	"os"
+	"time"
 
 	"github.com/linkdata/deadlock"
 	"github.com/logrusorgru/aurora/v3"
@@ -124,30 +126,42 @@ func HandlePacket(index uint64, data []byte, address string) {
 		return
 	}
 
+	start, cmd := time.Now(), "unknown"
 	switch (*buffer)[2] {
 	case ServerListRequest:
+		cmd = "server_list"
 		// logging.Info(moduleName, "Command:", aurora.Yellow("SERVER_LIST_REQUEST"))
 		handleServerListRequest(moduleName, index, address, (*buffer)[:packetSize])
 
 	case ServerInfoRequest:
+		cmd = "server_info"
 		logging.Info(moduleName, "Command:", aurora.Yellow("SERVER_INFO_REQUEST"))
 
 	case SendMessageRequest:
+		cmd = "send_message"
 		// logging.Info(moduleName, "Command:", aurora.Yellow("SEND_MESSAGE_REQUEST"))
 		handleSendMessageRequest(moduleName, index, address, (*buffer)[:packetSize])
 
 	case KeepaliveReply:
+		cmd = "keepalive_reply"
 		logging.Info(moduleName, "Command:", aurora.Yellow("KEEPALIVE_REPLY"))
 
 	case MapLoopRequest:
+		cmd = "maploop"
 		logging.Info(moduleName, "Command:", aurora.Yellow("MAPLOOP_REQUEST"))
 
 	case PlayerSearchRequest:
+		cmd = "player_search"
 		logging.Info(moduleName, "Command:", aurora.Yellow("PLAYER_SEARCH_REQUEST"))
 
 	default:
 		logging.Error(moduleName, "Unknown command:", aurora.Cyan((*buffer)[2]))
 	}
+	result := "ok"
+	if cmd == "unknown" {
+		result = "unknown"
+	}
+	httplog.Command(ServerName, cmd, result, start)
 
 	if len(*buffer) > int(packetSize) {
 		*buffer = (*buffer)[packetSize:]
