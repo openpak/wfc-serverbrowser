@@ -173,7 +173,7 @@ func handleServerListRequest(moduleName string, connIndex uint64, address string
 	callerPublicIP, _ := common.IPFormatToString(address)
 
 	servers := []map[string]string{}
-	if options&NoServerListOption == 0 && filter != "" && filter != " " && filter != "0" {
+	if options&NoServerListOption == 0 && filter != "" && filter != " " && filter != "0" && linkedCaller(callerPublicIP) {
 		rows, err := qr2.GetSessionServers()
 		if err != nil {
 			common.CloseConnection(ServerName, connIndex)
