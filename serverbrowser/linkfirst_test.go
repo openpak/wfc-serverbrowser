@@ -25,6 +25,9 @@ func TestLinkedCaller(t *testing.T) {
 	if linkedCaller("198.51.100.2:31000") || linkedCaller("203.0.113.9:1") {
 		t.Fatal("unlinked or unknown address allowed")
 	}
+	if !linkedCaller("10.89.2.182:59030") {
+		t.Fatal("a private (unverifiable) address must be allowed")
+	}
 	t.Setenv("WFC_LINK_FIRST", "")
 	if !linkedCaller("203.0.113.9:1") {
 		t.Fatal("gate off must allow everyone")

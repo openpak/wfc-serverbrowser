@@ -7,6 +7,7 @@ package serverbrowser
 
 import (
 	"context"
+	"net"
 	"strings"
 	"sync"
 	"sync/atomic"
@@ -53,6 +54,12 @@ func linkedCaller(callerPublicIP string) bool {
 		return true
 	}
 	ip := hostOnly(callerPublicIP)
+	// Behind rootless port publishing every caller arrives from a private container address and
+	// GPCM sees a different one, so the addresses cannot be compared: allow (wfc-nas and wfc-gpcm
+	// are the gate; this check only adds a layer where real addresses are visible).
+	if a := net.ParseIP(ip); a == nil || a.IsPrivate() || a.IsLoopback() {
+		return true
+	}
 	linkedIPsMu.Lock()
 	defer linkedIPsMu.Unlock()
 	if time.Now().After(linkedIPsUntil) {
