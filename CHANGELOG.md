@@ -1,5 +1,9 @@
 # Changelog
 
+## v0.3.0 - 2026-11-05
+
+- WFC_PROXY_LISTEN: a second, loopback-only listener for connections relayed by wfc-front with a PROXY v2 header (real player addresses, prds#149). The direct port is unchanged. Vendors wfc-common v0.9.0.
+
 ## v0.2.1 - 2026-11-05
 
 - Fix: behind rootless port publishing the browser and GPCM see different private addresses for the same console, so v0.2.0 refused list requests from linked consoles. A private caller address is now allowed (not comparable); the check applies only where real addresses are visible.
